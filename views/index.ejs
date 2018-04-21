@@ -6,14 +6,36 @@
   <link href="//cdn.bootcss.com/bootstrap-material-design/4.0.2/bootstrap-material-design.min.css" rel="stylesheet">
   <script src="//cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
   <script src="//cdn.bootcss.com/list.js/1.5.0/list.min.js"></script>
-  <link rel='stylesheet' href='/stylesheets/style.css' />
+  <link rel='stylesheet' href='/css/style.css' />
 </head>
 <body>
 <div class="container">
   <div class="row">
     <div class="col-md-12">
       <div id="link-wrapper">
-        <h1 class="title">输入关键字查找</h1>
+        <h1 class="title">标签分类 <small><a href="/tags">新增/编辑标签</a></small></h1>
+
+        <ul class="nav nav-pills">
+          <li class="nav-item">
+            <a class="nav-link
+              <%if (!locals.id) { %>
+                active
+              <% } %>
+              "
+              href="/">全部</a>
+          </li>
+          <% for (var i = 0; i < tags.length; i++) { %>
+            <li class="nav-item">
+              <a class="nav-link
+                <%if (locals.id && id == tags[i]['_id']) { %>
+                  active
+                <% } %>
+                " href="/t/<%=tags[i]['_id']%>"><%=tags[i]['tagname']%></a>
+            </li>
+          <%}%>
+        </ul>
+
+        <h1 class="title">关键字查找链接 <small><a href="/add">新增链接</a></small></h1>
         <div class="form-group">
           <input type="text" class="form-control fuzzy-search" id="title" placeholder="title">
         </div>
@@ -22,14 +44,33 @@
             <tr>
               <th>Title</th>
               <th>Url</th>
+              <th>Tag</th>
+              <th>操作</th>
             </tr>
           </thead>
           <tbody class="list">
             <% for (var i = 0; i < links.length; i++) { %>
               <tr _id="<%=links[i]['_id']%>">
-                <td class="title"><%=links[i]['title']%></td>
-                <td class="url"><a href="<%=links[i]['url']%>"><%=links[i]['url']%></a></td>
-                <td><button type="button" class="btn btn-outline-danger btn-sm del-btn">删除</button></td>
+                <td class="title" contenteditable><%=links[i]['title']%></td>
+                <td class="url"><a contenteditable href="<%=links[i]['url']%>"><%=links[i]['url']%></a></td>
+                <td>
+                  <!-- <%=links[i]['tagname']%> -->
+                  <select class="custom-select">
+                    <option>不选择标签</option>
+                    <!-- 需要增加没有标签选项 -->
+                    <% for (var j = 0; j < tags.length; j++) { %>
+                      <option tagid="<%=tags[j]['_id']%>"  tagname="<%=tags[j]['tagname']%>"  
+                        <%if (tags[j]['_id'] == links[i]['tagid']) { %>
+                          selected
+                        <% } %>
+                        ><%=tags[j]['tagname']%></option>
+                    <%}%>
+                  </select>
+                </td>
+                <td>
+                  <button type="button" class="btn btn-outline-danger btn-sm update-btn">修改</button>
+                  <button type="button" class="btn btn-outline-danger btn-sm del-btn">删除</button>
+                </td>
               </tr>
             <%}%>
           </tbody>
@@ -43,11 +84,29 @@
     valueNames: ['title', 'url']
   })
 
+  // 删除
   $('.del-btn').click(function() {
     let _id = $(this).parent().parent().attr('_id')
-    // console.log(_id)
     $.post('/link/del', {
       _id
+    }, res => {
+      location.reload()
+    })
+  })
+
+  // 修改
+  $('.update-btn').click(function() {
+    let _id = $(this).parent().parent().attr('_id')
+    let title = $(this).parent().prev().prev().prev().html()
+    let url = $(this).parent().prev().prev().find('a').html()
+    // console.log(_id, title, link)
+    let tagid = $(this).parent().prev().find('select option:checked').attr('tagid')
+    let tagname = $(this).parent().prev().find('select option:checked').attr('tagname')
+    // let tagname = 
+    
+    // return
+    $.post('/link/update', {
+      _id, title, url, tagid, tagname
     }, res => {
       location.reload()
     })
