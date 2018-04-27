@@ -2,6 +2,8 @@
 
 store some rarely used urls for a quick search
 
+![](https://ws3.sinaimg.cn/large/006tNc79gy1fqrg8ocir3j30vr0fjgny.jpg)
+
 make sure to have installed MongoDB already, and add a new database named `urldog`
 
 ```bash
