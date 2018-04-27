@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>新增链接</title>
+  <title>新增书签</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"/>
   <link href="//cdn.bootcss.com/bootstrap-material-design/4.0.2/bootstrap-material-design.min.css" rel="stylesheet">
   <link rel='stylesheet' href='/css/style.css' />
@@ -10,7 +10,7 @@
 <div class="container">
   <div class="row">
     <div class="col-md-12">
-      <h1 class="title">新增链接</h1>
+      <h1 class="title">新增书签</h1>
       <div class="form-group">
         <input type="text" class="form-control" id="title" placeholder="title">
       </div>
@@ -19,16 +19,12 @@
       </div>
       <div class="form-group">
         <% for (var i = 0; i < tags.length; i++) { %>
-          <!-- <button _id="<%=tags[i]['_id']%>" type="button" class="btn btn-outline-success"><%=tags[i]['name']%></button> -->
           <div class="form-check form-check-inline">
             <input class="form-check-input" type="radio" name="bookmarkTag" id="<%=tags[i]['_id']%>" tagid="<%=tags[i]['_id']%>" tagname="<%=tags[i]['tagname']%>" >
             <label class="form-check-label" for="<%=tags[i]['_id']%>"><%=tags[i]['tagname']%></label>
           </div>
         <%}%>
       </div>
-      <!-- <div class="form-group tags">
-        <button type="button" class="btn btn-outline-success">新增标签</button>
-      </div> -->
       <button type="button" class="btn btn-lg btn-outline-primary" id="btn">新增书签</button>
     </div>
   </div>
@@ -37,13 +33,15 @@
 <script src="//cdn.bootcss.com/list.js/1.5.0/list.min.js"></script>
 <script>
   $('#btn').click(() => {
-    $.post('/link/add', {
+    $.post('/api/bookmarks', {
       title: $('#title').val(),
       url: $('#url').val(),
       tagid: $("input[name='bookmarkTag']:checked").attr('tagid'),
       tagname: $("input[name='bookmarkTag']:checked").attr('tagname')
     }, res => {
-      location.reload()
+      if (!res.status) {
+        location.reload()
+      }
     })
   })
 </script>

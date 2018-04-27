@@ -46,20 +46,26 @@
 <script>
   // 新增
   $('#btn').click(() => {
-    $.post('/tag/add', {
+    $.post('/api/tags', {
       tagname: $('#tagName').val(),
     }, res => {
-      location.reload()
+      if (!res.status) {
+        location.reload()
+      }
     })
   })
 
   // 删除
   $('.del-btn').click(function() {
     let _id = $(this).parent().parent().attr('_id')
-    $.post('/tag/del', {
-      _id
-    }, res => {
-      location.reload()
+    $.ajax({
+      url: `/api/tags/${_id}`,
+      type: 'DELETE',
+      success: function(res) {
+        // if (!res.status) {
+          location.reload()
+        // }
+      }
     })
   })
 
@@ -67,12 +73,18 @@
   $('.update-btn').click(function() {
     let _id = $(this).parent().parent().attr('_id')
     let tagname = $(this).parent().prev().html()
-    // console.log(_id, title, link)
 
-    $.post('/tag/update', {
-      _id, tagname
-    }, res => {
-      location.reload()
+    $.ajax({
+      url: `/api/tags/${_id}`,
+      type: 'PUT',
+      data: {
+        tagname
+      },
+      success: function(res) {
+        if (!res.status) {
+          location.reload()
+        }
+      }
     })
   })
 </script>

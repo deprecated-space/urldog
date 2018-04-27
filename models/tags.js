@@ -1,12 +1,12 @@
 const mongoose = require('mongoose')
 const Schema = mongoose.Schema
 
-// urldog 为数据库名
-const uri = 'mongodb://localhost:27017/urldog'
-
 // 定义 schema
 let schema = new Schema({tagname: String })
 let Tag = mongoose.model('tag', schema)
+
+// urldog 为数据库名
+const uri = 'mongodb://localhost:27017/urldog'
 
 module.exports.getTags = () => {
   return new Promise(resolve => {
@@ -39,13 +39,14 @@ module.exports.insertTag = obj => {
 
         // 增
         let doc = new Tag(obj)
-        doc.save(err => {
+        doc.save((err, result) => {
           if (err) {
             console.log(err)
             return
           }
 
           console.log('保存成功')
+          resolve(result)
         })
 
         // 关闭数据库
@@ -58,7 +59,7 @@ module.exports.insertTag = obj => {
   })
 }
 
-module.exports.delTag = _id => {
+module.exports.delTag = obj => {
   return new Promise(resolve => {
     mongoose
       .connect(uri)
@@ -66,11 +67,12 @@ module.exports.delTag = _id => {
         console.log('😄 连接数据库成功')
         
         // 删
-        Tag.remove({_id}, err => {
+        Tag.remove({_id: obj.id}, err => {
           if (err) {
             console.log(err)
           } else {
             console.log('remove ok')
+            resolve({})
           }
         })
 
@@ -83,7 +85,6 @@ module.exports.delTag = _id => {
       })
   })
 }
-
 
 module.exports.updateTag = obj => {
   return new Promise(resolve => {
@@ -92,7 +93,6 @@ module.exports.updateTag = obj => {
       .then(db => {
         console.log('😄 连接数据库成功')
         
-        // 改
         // 条件
         var myWhere = {_id: obj._id}
 
@@ -100,16 +100,14 @@ module.exports.updateTag = obj => {
         // 更新的数据比较少用 $set，可用性还是很好
         var newValue = {$set: {tagname: obj.tagname}}
 
-        console.log('!!!!!!!!')
-        console.log('fuck!!!!!!!!!!!!!')
-        // console.log(obj)
-
         Tag.update(myWhere, newValue, (err, result) => {
           if (err) {
             console.log(err)
           } else {
-            console.log(result)
             console.log('update ok')
+
+            // 这里的 result 好像不是真实的数据？
+            resolve(result)
           }
         })
 

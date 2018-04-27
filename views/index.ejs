@@ -14,7 +14,6 @@
     <div class="col-md-12">
       <div id="link-wrapper">
         <h1 class="title">标签分类 <small><a href="/tags">新增/编辑标签</a></small></h1>
-
         <ul class="nav nav-pills">
           <li class="nav-item">
             <a class="nav-link
@@ -54,10 +53,9 @@
                 <td class="title" contenteditable><%=links[i]['title']%></td>
                 <td class="url"><a contenteditable href="<%=links[i]['url']%>"><%=links[i]['url']%></a></td>
                 <td>
-                  <!-- <%=links[i]['tagname']%> -->
                   <select class="custom-select">
-                    <option>不选择标签</option>
                     <!-- 需要增加没有标签选项 -->
+                    <option>不选择标签</option>
                     <% for (var j = 0; j < tags.length; j++) { %>
                       <option tagid="<%=tags[j]['_id']%>"  tagname="<%=tags[j]['tagname']%>"  
                         <%if (tags[j]['_id'] == links[i]['tagid']) { %>
@@ -87,10 +85,14 @@
   // 删除
   $('.del-btn').click(function() {
     let _id = $(this).parent().parent().attr('_id')
-    $.post('/link/del', {
-      _id
-    }, res => {
-      location.reload()
+    $.ajax({
+      url: `/api/bookmarks/${_id}`,
+      type: 'DELETE',
+      success: function(res) {
+        // if (!res.status) {
+          location.reload()
+        // }
+      }
     })
   })
 
@@ -99,16 +101,20 @@
     let _id = $(this).parent().parent().attr('_id')
     let title = $(this).parent().prev().prev().prev().html()
     let url = $(this).parent().prev().prev().find('a').html()
-    // console.log(_id, title, link)
     let tagid = $(this).parent().prev().find('select option:checked').attr('tagid')
     let tagname = $(this).parent().prev().find('select option:checked').attr('tagname')
-    // let tagname = 
     
-    // return
-    $.post('/link/update', {
-      _id, title, url, tagid, tagname
-    }, res => {
-      location.reload()
+    $.ajax({
+       url: `/api/bookmarks/${_id}`,
+       type: 'PUT',
+       data: {
+         title, url, tagid, tagname
+       },
+       success: function(res) {
+        if (!res.status) {
+          location.reload()
+        }
+       }
     })
   })
 </script>
